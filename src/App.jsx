@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Shield, AlertTriangle, Check, Lock, Smartphone, MapPin, Activity, Clock, Eye, EyeOff, Fingerprint, Bell, ChevronRight, Zap, X } from 'lucide-react';
+import { Shield, AlertTriangle, Check, Lock, Smartphone, MapPin, Activity, Clock, Eye, EyeOff, Fingerprint, Bell, ChevronRight, Zap, X, Menu } from 'lucide-react';
 
 // Real device fingerprinting utility
 const generateDeviceFingerprint = async () => {
@@ -328,7 +328,7 @@ const CyberSentrix = () => {
   const requestLocationPermission = () => {
     navigator.geolocation.getCurrentPosition(
       () => {
-        window.location.reload(); // Reload to get location
+        window.location.reload();
       },
       (error) => {
         alert('Location permission denied. Please enable location access in your browser settings.');
@@ -337,7 +337,6 @@ const CyberSentrix = () => {
   };
 
   const simulateSIMSwap = async () => {
-    // Simulate SIM swap by changing device fingerprint
     const fakeFingerprint = await hashString(Math.random().toString());
     
     addEvent('simSwap', 'SIM card changed to new device', 'critical');
@@ -365,7 +364,6 @@ const CyberSentrix = () => {
       return;
     }
     
-    // Calculate distance from trusted location
     const distance = trustedLocation ? 
       calculateDistance(
         trustedLocation.latitude, 
@@ -401,7 +399,7 @@ const CyberSentrix = () => {
   };
 
   const calculateDistance = (lat1, lon1, lat2, lon2) => {
-    const R = 6371; // Earth's radius in km
+    const R = 6371;
     const dLat = (lat2 - lat1) * Math.PI / 180;
     const dLon = (lon2 - lon1) * Math.PI / 180;
     const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
@@ -420,10 +418,9 @@ const CyberSentrix = () => {
     setBiometricVerifying(true);
     
     if (biometricAvailable) {
-      // Use Web Authentication API for real biometric verification
       try {
         const publicKeyCredentialCreationOptions = {
-          challenge: new Uint8Array(32), // In production, get from server
+          challenge: new Uint8Array(32),
           rp: {
             name: "CyberSentrix",
             id: window.location.hostname,
@@ -442,13 +439,11 @@ const CyberSentrix = () => {
           attestation: "direct"
         };
 
-        // This will trigger device biometric (Face ID, Touch ID, Windows Hello, etc.)
         const credential = await navigator.credentials.create({
           publicKey: publicKeyCredentialCreationOptions
         });
 
         if (credential) {
-          // Biometric verification successful
           setTimeout(() => {
             setBiometricVerifying(false);
             setRecoveryStep(1);
@@ -457,7 +452,6 @@ const CyberSentrix = () => {
         }
       } catch (error) {
         console.error('Biometric verification error:', error);
-        // Fall back to simulated verification
         setTimeout(() => {
           setBiometricVerifying(false);
           setRecoveryStep(1);
@@ -465,7 +459,6 @@ const CyberSentrix = () => {
         }, 2000);
       }
     } else {
-      // Simulated verification for devices without biometric support
       setTimeout(() => {
         setBiometricVerifying(false);
         setRecoveryStep(1);
@@ -480,7 +473,6 @@ const CyberSentrix = () => {
       setTimeout(async () => {
         setRecoveryStep(3);
         setTimeout(async () => {
-          // Restore to real device fingerprint
           const realFingerprint = await generateDeviceFingerprint();
           
           setServicesLocked(false);
@@ -493,7 +485,6 @@ const CyberSentrix = () => {
             trusted: true
           }));
           
-          // Restore trusted location
           if (trustedLocation) {
             setLocation(trustedLocation);
           }
@@ -512,7 +503,7 @@ const CyberSentrix = () => {
       background: 'linear-gradient(135deg, #0a0e27 0%, #1a1f3a 50%, #0f1629 100%)',
       color: '#e0e7ff',
       fontFamily: '"JetBrains Mono", "Courier New", monospace',
-      padding: '20px',
+      padding: 'clamp(12px, 3vw, 20px)',
       position: 'relative',
       overflow: 'hidden'
     }}>
@@ -564,16 +555,35 @@ const CyberSentrix = () => {
           0%, 100% { transform: scale(1); }
           50% { transform: scale(1.05); }
         }
+
+        /* Mobile scrollbar styling */
+        ::-webkit-scrollbar {
+          width: 6px;
+          height: 6px;
+        }
+        
+        ::-webkit-scrollbar-track {
+          background: rgba(15, 23, 42, 0.5);
+        }
+        
+        ::-webkit-scrollbar-thumb {
+          background: rgba(99, 102, 241, 0.5);
+          border-radius: 3px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+          background: rgba(99, 102, 241, 0.7);
+        }
       `}</style>
 
       {/* Header */}
-      <div style={{ position: 'relative', zIndex: 10, marginBottom: '30px' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '15px', marginBottom: '10px' }}>
-          <Shield size={40} color="#6366f1" style={{ animation: 'glow 2s infinite' }} />
-          <div>
+      <div style={{ position: 'relative', zIndex: 10, marginBottom: 'clamp(15px, 4vw, 30px)' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 'clamp(10px, 2vw, 15px)', marginBottom: '10px' }}>
+          <Shield size={window.innerWidth < 768 ? 28 : 40} color="#6366f1" style={{ animation: 'glow 2s infinite', flexShrink: 0 }} />
+          <div style={{ minWidth: 0 }}>
             <h1 style={{ 
               margin: 0, 
-              fontSize: '32px', 
+              fontSize: 'clamp(20px, 5vw, 32px)', 
               fontWeight: 700,
               background: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)',
               WebkitBackgroundClip: 'text',
@@ -582,29 +592,45 @@ const CyberSentrix = () => {
             }}>
               CyberSentrix
             </h1>
-            <p style={{ margin: '5px 0 0 0', fontSize: '13px', color: '#94a3b8', letterSpacing: '0.5px' }}>
-              AI-POWERED FRAUD DETECTION & RESPONSE SYSTEM
+            <p style={{ 
+              margin: '5px 0 0 0', 
+              fontSize: 'clamp(9px, 2vw, 13px)', 
+              color: '#94a3b8', 
+              letterSpacing: '0.5px',
+              whiteSpace: window.innerWidth < 480 ? 'normal' : 'nowrap',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis'
+            }}>
+              AI-POWERED FRAUD DETECTION & RESPONSE
             </p>
           </div>
         </div>
         
         {/* Real-time status indicators */}
-        <div style={{ display: 'flex', gap: '15px', fontSize: '11px', marginTop: '15px' }}>
+        <div style={{ 
+          display: 'flex', 
+          flexWrap: 'wrap',
+          gap: 'clamp(8px, 2vw, 15px)', 
+          fontSize: 'clamp(9px, 2vw, 11px)', 
+          marginTop: '15px' 
+        }}>
           <div style={{ 
-            padding: '6px 12px', 
+            padding: 'clamp(4px, 1vw, 6px) clamp(8px, 2vw, 12px)', 
             background: biometricAvailable ? 'rgba(0, 255, 136, 0.1)' : 'rgba(100, 116, 139, 0.1)',
             border: `1px solid ${biometricAvailable ? '#00ff88' : '#64748b'}`,
             borderRadius: '6px',
-            color: biometricAvailable ? '#00ff88' : '#94a3b8'
+            color: biometricAvailable ? '#00ff88' : '#94a3b8',
+            whiteSpace: 'nowrap'
           }}>
             🔐 Biometric: {biometricAvailable ? 'Available' : 'Not Supported'}
           </div>
           <div style={{ 
-            padding: '6px 12px', 
+            padding: 'clamp(4px, 1vw, 6px) clamp(8px, 2vw, 12px)', 
             background: locationPermission === 'granted' ? 'rgba(0, 255, 136, 0.1)' : 'rgba(255, 153, 51, 0.1)',
             border: `1px solid ${locationPermission === 'granted' ? '#00ff88' : '#ff9933'}`,
             borderRadius: '6px',
-            color: locationPermission === 'granted' ? '#00ff88' : '#ff9933'
+            color: locationPermission === 'granted' ? '#00ff88' : '#ff9933',
+            whiteSpace: 'nowrap'
           }}>
             📍 Location: {locationPermission === 'granted' ? 'Enabled' : locationPermission === 'denied' ? 'Denied' : 'Not Requested'}
           </div>
@@ -624,24 +650,27 @@ const CyberSentrix = () => {
           alignItems: 'center',
           justifyContent: 'center',
           zIndex: 1000,
-          animation: 'slideIn 0.3s ease-out'
+          animation: 'slideIn 0.3s ease-out',
+          padding: '20px'
         }}>
           <div style={{
             background: 'linear-gradient(135deg, #1e293b 0%, #0f172a 100%)',
             border: `2px solid ${riskLevel.color}`,
             borderRadius: '12px',
-            padding: '30px',
+            padding: 'clamp(20px, 5vw, 30px)',
             maxWidth: '500px',
-            width: '90%',
-            boxShadow: `0 20px 60px rgba(0, 0, 0, 0.5), 0 0 40px ${riskLevel.color}40`
+            width: '100%',
+            boxShadow: `0 20px 60px rgba(0, 0, 0, 0.5), 0 0 40px ${riskLevel.color}40`,
+            maxHeight: '90vh',
+            overflowY: 'auto'
           }}>
             <div style={{ display: 'flex', alignItems: 'flex-start', gap: '15px', marginBottom: '20px' }}>
-              <AlertTriangle size={32} color={riskLevel.color} style={{ flexShrink: 0 }} />
-              <div style={{ flex: 1 }}>
-                <h3 style={{ margin: '0 0 10px 0', fontSize: '18px', color: riskLevel.color }}>
+              <AlertTriangle size={window.innerWidth < 768 ? 24 : 32} color={riskLevel.color} style={{ flexShrink: 0 }} />
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <h3 style={{ margin: '0 0 10px 0', fontSize: 'clamp(14px, 3vw, 18px)', color: riskLevel.color }}>
                   SECURITY ALERT
                 </h3>
-                <p style={{ margin: 0, fontSize: '14px', lineHeight: '1.6', color: '#cbd5e1' }}>
+                <p style={{ margin: 0, fontSize: 'clamp(12px, 2.5vw, 14px)', lineHeight: '1.6', color: '#cbd5e1', wordWrap: 'break-word' }}>
                   {alertMessage}
                 </p>
               </div>
@@ -650,12 +679,12 @@ const CyberSentrix = () => {
               onClick={() => setShowAlert(false)}
               style={{
                 width: '100%',
-                padding: '12px',
+                padding: 'clamp(10px, 2vw, 12px)',
                 background: riskLevel.color,
                 color: '#fff',
                 border: 'none',
                 borderRadius: '8px',
-                fontSize: '14px',
+                fontSize: 'clamp(12px, 2.5vw, 14px)',
                 fontWeight: 600,
                 cursor: 'pointer',
                 fontFamily: 'inherit'
@@ -680,18 +709,21 @@ const CyberSentrix = () => {
           alignItems: 'center',
           justifyContent: 'center',
           zIndex: 1000,
-          animation: 'slideIn 0.3s ease-out'
+          animation: 'slideIn 0.3s ease-out',
+          padding: '20px'
         }}>
           <div style={{
             background: 'linear-gradient(135deg, #1e293b 0%, #0f172a 100%)',
             border: '2px solid #6366f1',
             borderRadius: '12px',
-            padding: '40px',
+            padding: 'clamp(25px, 6vw, 40px)',
             maxWidth: '500px',
-            width: '90%',
-            boxShadow: '0 20px 60px rgba(0, 0, 0, 0.5), 0 0 40px rgba(99, 102, 241, 0.3)'
+            width: '100%',
+            boxShadow: '0 20px 60px rgba(0, 0, 0, 0.5), 0 0 40px rgba(99, 102, 241, 0.3)',
+            maxHeight: '90vh',
+            overflowY: 'auto'
           }}>
-            <h3 style={{ margin: '0 0 30px 0', fontSize: '22px', textAlign: 'center' }}>
+            <h3 style={{ margin: '0 0 clamp(20px, 5vw, 30px) 0', fontSize: 'clamp(16px, 4vw, 22px)', textAlign: 'center' }}>
               Account Recovery Process
             </h3>
 
@@ -699,9 +731,9 @@ const CyberSentrix = () => {
             {recoveryStep === 0 && (
               <div style={{ textAlign: 'center' }}>
                 <div style={{
-                  width: '120px',
-                  height: '120px',
-                  margin: '0 auto 30px',
+                  width: 'clamp(80px, 20vw, 120px)',
+                  height: 'clamp(80px, 20vw, 120px)',
+                  margin: '0 auto clamp(20px, 5vw, 30px)',
                   borderRadius: '50%',
                   background: biometricVerifying ? 'rgba(99, 102, 241, 0.2)' : 'rgba(99, 102, 241, 0.1)',
                   border: '3px solid #6366f1',
@@ -710,15 +742,15 @@ const CyberSentrix = () => {
                   justifyContent: 'center',
                   animation: biometricVerifying ? 'riskPulse 1s infinite' : 'none'
                 }}>
-                  <Fingerprint size={60} color="#6366f1" />
+                  <Fingerprint size={window.innerWidth < 768 ? 40 : 60} color="#6366f1" />
                 </div>
-                <p style={{ marginBottom: '20px', color: '#cbd5e1', fontSize: '13px' }}>
+                <p style={{ marginBottom: '20px', color: '#cbd5e1', fontSize: 'clamp(11px, 2.5vw, 13px)' }}>
                   {biometricVerifying ? 'Verifying your identity...' : 
                    biometricAvailable ? 'Your device will prompt for biometric authentication' : 
                    'Click to verify (simulated on this device)'}
                 </p>
                 {biometricAvailable && !biometricVerifying && (
-                  <p style={{ marginBottom: '30px', color: '#94a3b8', fontSize: '12px' }}>
+                  <p style={{ marginBottom: 'clamp(20px, 5vw, 30px)', color: '#94a3b8', fontSize: 'clamp(10px, 2vw, 12px)' }}>
                     🔐 Use Face ID, Touch ID, or Windows Hello
                   </p>
                 )}
@@ -727,12 +759,12 @@ const CyberSentrix = () => {
                     onClick={verifyBiometric}
                     style={{
                       width: '100%',
-                      padding: '14px',
+                      padding: 'clamp(12px, 3vw, 14px)',
                       background: '#6366f1',
                       color: '#fff',
                       border: 'none',
                       borderRadius: '8px',
-                      fontSize: '14px',
+                      fontSize: 'clamp(12px, 2.5vw, 14px)',
                       fontWeight: 600,
                       cursor: 'pointer',
                       fontFamily: 'inherit'
@@ -747,11 +779,11 @@ const CyberSentrix = () => {
             {/* Step 1: Identity Confirmed */}
             {recoveryStep === 1 && (
               <div style={{ textAlign: 'center' }}>
-                <Check size={80} color="#00ff88" style={{ marginBottom: '20px' }} />
-                <h4 style={{ margin: '0 0 10px 0', color: '#00ff88', fontSize: '18px' }}>
+                <Check size={window.innerWidth < 768 ? 60 : 80} color="#00ff88" style={{ marginBottom: '20px' }} />
+                <h4 style={{ margin: '0 0 10px 0', color: '#00ff88', fontSize: 'clamp(14px, 3vw, 18px)' }}>
                   Identity Verified
                 </h4>
-                <p style={{ color: '#cbd5e1' }}>Processing recovery...</p>
+                <p style={{ color: '#cbd5e1', fontSize: 'clamp(12px, 2.5vw, 14px)' }}>Processing recovery...</p>
               </div>
             )}
 
@@ -759,23 +791,23 @@ const CyberSentrix = () => {
             {recoveryStep === 2 && (
               <div style={{ textAlign: 'center' }}>
                 <div style={{ marginBottom: '20px', animation: 'spin 1s linear infinite' }}>
-                  <Zap size={80} color="#6366f1" />
+                  <Zap size={window.innerWidth < 768 ? 60 : 80} color="#6366f1" />
                 </div>
-                <h4 style={{ margin: '0 0 10px 0', color: '#6366f1', fontSize: '18px' }}>
+                <h4 style={{ margin: '0 0 10px 0', color: '#6366f1', fontSize: 'clamp(14px, 3vw, 18px)' }}>
                   Restoring Services
                 </h4>
-                <p style={{ color: '#cbd5e1' }}>Re-enabling transaction capabilities...</p>
+                <p style={{ color: '#cbd5e1', fontSize: 'clamp(12px, 2.5vw, 14px)' }}>Re-enabling transaction capabilities...</p>
               </div>
             )}
 
             {/* Step 3: Complete */}
             {recoveryStep === 3 && (
               <div style={{ textAlign: 'center' }}>
-                <Shield size={80} color="#00ff88" style={{ marginBottom: '20px' }} />
-                <h4 style={{ margin: '0 0 10px 0', color: '#00ff88', fontSize: '18px' }}>
+                <Shield size={window.innerWidth < 768 ? 60 : 80} color="#00ff88" style={{ marginBottom: '20px' }} />
+                <h4 style={{ margin: '0 0 10px 0', color: '#00ff88', fontSize: 'clamp(14px, 3vw, 18px)' }}>
                   Recovery Complete
                 </h4>
-                <p style={{ color: '#cbd5e1' }}>Your account is now secure</p>
+                <p style={{ color: '#cbd5e1', fontSize: 'clamp(12px, 2.5vw, 14px)' }}>Your account is now secure</p>
               </div>
             )}
           </div>
@@ -789,19 +821,19 @@ const CyberSentrix = () => {
           backdropFilter: 'blur(10px)',
           border: `2px solid ${riskLevel.color}`,
           borderRadius: '16px',
-          padding: '30px',
-          marginBottom: '25px',
+          padding: 'clamp(20px, 4vw, 30px)',
+          marginBottom: 'clamp(15px, 3vw, 25px)',
           boxShadow: `0 8px 32px rgba(0, 0, 0, 0.3), 0 0 30px ${riskLevel.color}20`,
           animation: riskScore >= 70 ? 'glow 2s infinite' : 'none'
         }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', flexWrap: 'wrap', gap: '15px' }}>
             <div>
-              <h2 style={{ margin: '0 0 5px 0', fontSize: '16px', color: '#94a3b8', fontWeight: 400, letterSpacing: '1px' }}>
+              <h2 style={{ margin: '0 0 5px 0', fontSize: 'clamp(12px, 2.5vw, 16px)', color: '#94a3b8', fontWeight: 400, letterSpacing: '1px' }}>
                 THREAT RISK SCORE
               </h2>
               <div style={{ display: 'flex', alignItems: 'baseline', gap: '10px' }}>
                 <span style={{ 
-                  fontSize: '48px', 
+                  fontSize: 'clamp(32px, 8vw, 48px)', 
                   fontWeight: 700, 
                   color: riskLevel.color,
                   lineHeight: 1,
@@ -809,15 +841,15 @@ const CyberSentrix = () => {
                 }}>
                   {riskScore}
                 </span>
-                <span style={{ fontSize: '20px', color: '#64748b' }}>/100</span>
+                <span style={{ fontSize: 'clamp(14px, 3vw, 20px)', color: '#64748b' }}>/100</span>
               </div>
             </div>
             <div style={{
-              padding: '12px 24px',
+              padding: 'clamp(8px, 2vw, 12px) clamp(16px, 3vw, 24px)',
               background: riskLevel.bg,
               border: `2px solid ${riskLevel.color}`,
               borderRadius: '8px',
-              fontSize: '14px',
+              fontSize: 'clamp(11px, 2.5vw, 14px)',
               fontWeight: 700,
               color: riskLevel.color,
               letterSpacing: '1px'
@@ -828,7 +860,7 @@ const CyberSentrix = () => {
 
           {/* Risk meter bar */}
           <div style={{
-            height: '12px',
+            height: 'clamp(8px, 2vw, 12px)',
             background: 'rgba(15, 23, 42, 0.8)',
             borderRadius: '6px',
             overflow: 'hidden',
@@ -845,52 +877,57 @@ const CyberSentrix = () => {
         </div>
 
         {/* Main Grid */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '20px', marginBottom: '25px' }}>
-          {/* Device Status - NOW WITH REAL DATA */}
+        <div style={{ 
+          display: 'grid', 
+          gridTemplateColumns: window.innerWidth < 768 ? '1fr' : 'repeat(auto-fit, minmax(280px, 1fr))', 
+          gap: 'clamp(12px, 3vw, 20px)', 
+          marginBottom: 'clamp(15px, 3vw, 25px)' 
+        }}>
+          {/* Device Status */}
           <div style={{
             background: 'linear-gradient(135deg, rgba(30, 41, 59, 0.6) 0%, rgba(15, 23, 42, 0.6) 100%)',
             backdropFilter: 'blur(10px)',
             border: `2px solid ${deviceInfo.trusted ? '#334155' : '#ff3366'}`,
             borderRadius: '12px',
-            padding: '24px',
+            padding: 'clamp(16px, 4vw, 24px)',
             boxShadow: '0 4px 16px rgba(0, 0, 0, 0.2)'
           }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '20px' }}>
-              <Smartphone size={24} color={deviceInfo.trusted ? '#6366f1' : '#ff3366'} />
-              <h3 style={{ margin: 0, fontSize: '16px', fontWeight: 600, letterSpacing: '0.5px' }}>
+              <Smartphone size={window.innerWidth < 768 ? 20 : 24} color={deviceInfo.trusted ? '#6366f1' : '#ff3366'} />
+              <h3 style={{ margin: 0, fontSize: 'clamp(13px, 3vw, 16px)', fontWeight: 600, letterSpacing: '0.5px' }}>
                 DEVICE STATUS (REAL)
               </h3>
             </div>
-            <div style={{ fontSize: '12px', lineHeight: '1.8' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
+            <div style={{ fontSize: 'clamp(10px, 2vw, 12px)', lineHeight: '1.8' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px', gap: '10px' }}>
                 <span style={{ color: '#94a3b8' }}>Device:</span>
-                <span style={{ color: deviceInfo.trusted ? '#00ff88' : '#ff3366', fontWeight: 600 }}>
+                <span style={{ color: deviceInfo.trusted ? '#00ff88' : '#ff3366', fontWeight: 600, textAlign: 'right' }}>
                   {deviceInfo.name}
                 </span>
               </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px', gap: '10px' }}>
                 <span style={{ color: '#94a3b8' }}>Fingerprint:</span>
-                <span style={{ fontFamily: 'monospace', color: '#cbd5e1', fontSize: '11px' }}>
+                <span style={{ fontFamily: 'monospace', color: '#cbd5e1', fontSize: 'clamp(9px, 1.8vw, 11px)', wordBreak: 'break-all', textAlign: 'right' }}>
                   {deviceInfo.fingerprint}
                 </span>
               </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px', gap: '10px' }}>
                 <span style={{ color: '#94a3b8' }}>Platform:</span>
-                <span style={{ color: '#cbd5e1' }}>{deviceInfo.platform}</span>
+                <span style={{ color: '#cbd5e1', textAlign: 'right' }}>{deviceInfo.platform}</span>
               </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px', gap: '10px' }}>
                 <span style={{ color: '#94a3b8' }}>CPU Cores:</span>
                 <span style={{ color: '#cbd5e1' }}>{deviceInfo.cores}</span>
               </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px', gap: '10px' }}>
                 <span style={{ color: '#94a3b8' }}>Memory:</span>
                 <span style={{ color: '#cbd5e1' }}>{deviceInfo.memory}</span>
               </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px', gap: '10px' }}>
                 <span style={{ color: '#94a3b8' }}>Screen:</span>
                 <span style={{ color: '#cbd5e1' }}>{deviceInfo.screen}</span>
               </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', gap: '10px' }}>
                 <span style={{ color: '#94a3b8' }}>Status:</span>
                 <span style={{ 
                   color: deviceInfo.trusted ? '#00ff88' : '#ff3366',
@@ -905,43 +942,43 @@ const CyberSentrix = () => {
             </div>
           </div>
 
-          {/* Location Status - NOW WITH REAL DATA */}
+          {/* Location Status */}
           <div style={{
             background: 'linear-gradient(135deg, rgba(30, 41, 59, 0.6) 0%, rgba(15, 23, 42, 0.6) 100%)',
             backdropFilter: 'blur(10px)',
             border: `2px solid ${location.trusted ? '#334155' : '#ff3366'}`,
             borderRadius: '12px',
-            padding: '24px',
+            padding: 'clamp(16px, 4vw, 24px)',
             boxShadow: '0 4px 16px rgba(0, 0, 0, 0.2)'
           }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '20px' }}>
-              <MapPin size={24} color={location.trusted ? '#6366f1' : '#ff3366'} />
-              <h3 style={{ margin: 0, fontSize: '16px', fontWeight: 600, letterSpacing: '0.5px' }}>
+              <MapPin size={window.innerWidth < 768 ? 20 : 24} color={location.trusted ? '#6366f1' : '#ff3366'} />
+              <h3 style={{ margin: 0, fontSize: 'clamp(13px, 3vw, 16px)', fontWeight: 600, letterSpacing: '0.5px' }}>
                 LOCATION (REAL)
               </h3>
             </div>
-            <div style={{ fontSize: '12px', lineHeight: '1.8' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
+            <div style={{ fontSize: 'clamp(10px, 2vw, 12px)', lineHeight: '1.8' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px', gap: '10px' }}>
                 <span style={{ color: '#94a3b8' }}>Current:</span>
-                <span style={{ color: location.trusted ? '#00ff88' : '#ff3366', fontWeight: 600 }}>
+                <span style={{ color: location.trusted ? '#00ff88' : '#ff3366', fontWeight: 600, textAlign: 'right', wordBreak: 'break-word' }}>
                   {location.city}
                 </span>
               </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px', gap: '10px' }}>
                 <span style={{ color: '#94a3b8' }}>Coordinates:</span>
-                <span style={{ fontFamily: 'monospace', fontSize: '10px', color: '#cbd5e1' }}>
+                <span style={{ fontFamily: 'monospace', fontSize: 'clamp(9px, 1.8vw, 10px)', color: '#cbd5e1', textAlign: 'right' }}>
                   {location.coordinates}
                 </span>
               </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px', gap: '10px' }}>
                 <span style={{ color: '#94a3b8' }}>Timezone:</span>
-                <span style={{ color: '#cbd5e1', fontSize: '11px' }}>{location.timezone || 'N/A'}</span>
+                <span style={{ color: '#cbd5e1', fontSize: 'clamp(9px, 1.8vw, 11px)', textAlign: 'right', wordBreak: 'break-word' }}>{location.timezone || 'N/A'}</span>
               </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px', gap: '10px' }}>
                 <span style={{ color: '#94a3b8' }}>Accuracy:</span>
                 <span style={{ color: '#cbd5e1' }}>{location.accuracy || 'N/A'}</span>
               </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', gap: '10px' }}>
                 <span style={{ color: '#94a3b8' }}>Status:</span>
                 <span style={{ 
                   color: location.trusted ? '#00ff88' : '#ff3366',
@@ -960,12 +997,12 @@ const CyberSentrix = () => {
                 style={{
                   width: '100%',
                   marginTop: '12px',
-                  padding: '10px',
+                  padding: 'clamp(8px, 2vw, 10px)',
                   background: '#6366f1',
                   color: '#fff',
                   border: 'none',
                   borderRadius: '6px',
-                  fontSize: '12px',
+                  fontSize: 'clamp(10px, 2vw, 12px)',
                   fontWeight: 600,
                   cursor: 'pointer',
                   fontFamily: 'inherit'
@@ -982,22 +1019,22 @@ const CyberSentrix = () => {
             backdropFilter: 'blur(10px)',
             border: `2px solid ${servicesLocked ? '#ff3366' : '#334155'}`,
             borderRadius: '12px',
-            padding: '24px',
+            padding: 'clamp(16px, 4vw, 24px)',
             boxShadow: '0 4px 16px rgba(0, 0, 0, 0.2)'
           }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '20px' }}>
-              {servicesLocked ? <Lock size={24} color="#ff3366" /> : <Activity size={24} color="#6366f1" />}
-              <h3 style={{ margin: 0, fontSize: '16px', fontWeight: 600, letterSpacing: '0.5px' }}>
+              {servicesLocked ? <Lock size={window.innerWidth < 768 ? 20 : 24} color="#ff3366" /> : <Activity size={window.innerWidth < 768 ? 20 : 24} color="#6366f1" />}
+              <h3 style={{ margin: 0, fontSize: 'clamp(13px, 3vw, 16px)', fontWeight: 600, letterSpacing: '0.5px' }}>
                 SERVICES STATUS
               </h3>
             </div>
-            <div style={{ fontSize: '12px' }}>
+            <div style={{ fontSize: 'clamp(10px, 2vw, 12px)' }}>
               {['Banking', 'Payments', 'Transfers', 'OTP Auth'].map((service, i) => (
                 <div key={i} style={{
                   display: 'flex',
                   justifyContent: 'space-between',
                   alignItems: 'center',
-                  padding: '12px',
+                  padding: 'clamp(8px, 2vw, 12px)',
                   background: servicesLocked ? 'rgba(255, 51, 102, 0.1)' : 'rgba(99, 102, 241, 0.05)',
                   borderRadius: '6px',
                   marginBottom: i < 3 ? '8px' : 0,
@@ -1005,9 +1042,9 @@ const CyberSentrix = () => {
                 }}>
                   <span style={{ color: '#cbd5e1' }}>{service}</span>
                   <span style={{
-                    padding: '4px 12px',
+                    padding: '4px clamp(8px, 2vw, 12px)',
                     borderRadius: '4px',
-                    fontSize: '11px',
+                    fontSize: 'clamp(9px, 2vw, 11px)',
                     fontWeight: 600,
                     background: servicesLocked ? '#ff3366' : '#00ff88',
                     color: servicesLocked ? '#fff' : '#0a0e27'
@@ -1026,25 +1063,38 @@ const CyberSentrix = () => {
           backdropFilter: 'blur(10px)',
           border: '2px solid #334155',
           borderRadius: '12px',
-          padding: '24px',
-          marginBottom: '25px',
+          padding: 'clamp(16px, 4vw, 24px)',
+          marginBottom: 'clamp(15px, 3vw, 25px)',
           boxShadow: '0 4px 16px rgba(0, 0, 0, 0.2)'
         }}>
-          <h3 style={{ margin: '0 0 20px 0', fontSize: '16px', fontWeight: 600, letterSpacing: '0.5px', display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <Zap size={24} color="#6366f1" />
-            THREAT SIMULATION CONTROLS
+          <h3 style={{ 
+            margin: '0 0 clamp(12px, 3vw, 20px) 0', 
+            fontSize: 'clamp(13px, 3vw, 16px)', 
+            fontWeight: 600, 
+            letterSpacing: '0.5px', 
+            display: 'flex', 
+            alignItems: 'center', 
+            gap: '10px',
+            flexWrap: 'wrap'
+          }}>
+            <Zap size={window.innerWidth < 768 ? 20 : 24} color="#6366f1" />
+            <span>THREAT SIMULATION CONTROLS</span>
           </h3>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '12px' }}>
+          <div style={{ 
+            display: 'grid', 
+            gridTemplateColumns: window.innerWidth < 640 ? '1fr' : 'repeat(auto-fit, minmax(180px, 1fr))', 
+            gap: 'clamp(8px, 2vw, 12px)' 
+          }}>
             <button
               onClick={simulateSIMSwap}
               disabled={servicesLocked}
               style={{
-                padding: '14px',
+                padding: 'clamp(10px, 2.5vw, 14px)',
                 background: servicesLocked ? '#334155' : 'linear-gradient(135deg, #dc2626 0%, #991b1b 100%)',
                 color: servicesLocked ? '#64748b' : '#fff',
                 border: 'none',
                 borderRadius: '8px',
-                fontSize: '13px',
+                fontSize: 'clamp(10px, 2vw, 13px)',
                 fontWeight: 600,
                 cursor: servicesLocked ? 'not-allowed' : 'pointer',
                 fontFamily: 'inherit',
@@ -1058,12 +1108,12 @@ const CyberSentrix = () => {
               onClick={simulateNewDevice}
               disabled={servicesLocked}
               style={{
-                padding: '14px',
+                padding: 'clamp(10px, 2.5vw, 14px)',
                 background: servicesLocked ? '#334155' : 'linear-gradient(135deg, #ea580c 0%, #9a3412 100%)',
                 color: servicesLocked ? '#64748b' : '#fff',
                 border: 'none',
                 borderRadius: '8px',
-                fontSize: '13px',
+                fontSize: 'clamp(10px, 2vw, 13px)',
                 fontWeight: 600,
                 cursor: servicesLocked ? 'not-allowed' : 'pointer',
                 fontFamily: 'inherit',
@@ -1077,12 +1127,12 @@ const CyberSentrix = () => {
               onClick={simulateLocationChange}
               disabled={servicesLocked}
               style={{
-                padding: '14px',
+                padding: 'clamp(10px, 2.5vw, 14px)',
                 background: servicesLocked ? '#334155' : 'linear-gradient(135deg, #ca8a04 0%, #713f12 100%)',
                 color: servicesLocked ? '#64748b' : '#fff',
                 border: 'none',
                 borderRadius: '8px',
-                fontSize: '13px',
+                fontSize: 'clamp(10px, 2vw, 13px)',
                 fontWeight: 600,
                 cursor: servicesLocked ? 'not-allowed' : 'pointer',
                 fontFamily: 'inherit',
@@ -1096,12 +1146,12 @@ const CyberSentrix = () => {
               onClick={simulateOTPBurst}
               disabled={servicesLocked}
               style={{
-                padding: '14px',
+                padding: 'clamp(10px, 2.5vw, 14px)',
                 background: servicesLocked ? '#334155' : 'linear-gradient(135deg, #7c3aed 0%, #5b21b6 100%)',
                 color: servicesLocked ? '#64748b' : '#fff',
                 border: 'none',
                 borderRadius: '8px',
-                fontSize: '13px',
+                fontSize: 'clamp(10px, 2vw, 13px)',
                 fontWeight: 600,
                 cursor: servicesLocked ? 'not-allowed' : 'pointer',
                 fontFamily: 'inherit',
@@ -1117,13 +1167,13 @@ const CyberSentrix = () => {
               onClick={startRecovery}
               style={{
                 width: '100%',
-                marginTop: '12px',
-                padding: '16px',
+                marginTop: 'clamp(10px, 2vw, 12px)',
+                padding: 'clamp(12px, 3vw, 16px)',
                 background: 'linear-gradient(135deg, #00ff88 0%, #00cc6a 100%)',
                 color: '#0a0e27',
                 border: 'none',
                 borderRadius: '8px',
-                fontSize: '14px',
+                fontSize: 'clamp(12px, 2.5vw, 14px)',
                 fontWeight: 700,
                 cursor: 'pointer',
                 fontFamily: 'inherit',
@@ -1134,51 +1184,55 @@ const CyberSentrix = () => {
                 boxShadow: '0 0 30px rgba(0, 255, 136, 0.4)'
               }}
             >
-              <Fingerprint size={20} />
-              INITIATE ACCOUNT RECOVERY
+              <Fingerprint size={window.innerWidth < 768 ? 16 : 20} />
+              <span>INITIATE ACCOUNT RECOVERY</span>
             </button>
           )}
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '20px' }}>
+        <div style={{ 
+          display: 'grid', 
+          gridTemplateColumns: window.innerWidth < 768 ? '1fr' : 'repeat(auto-fit, minmax(280px, 1fr))', 
+          gap: 'clamp(12px, 3vw, 20px)' 
+        }}>
           {/* Event Log */}
           <div style={{
             background: 'linear-gradient(135deg, rgba(30, 41, 59, 0.6) 0%, rgba(15, 23, 42, 0.6) 100%)',
             backdropFilter: 'blur(10px)',
             border: '2px solid #334155',
             borderRadius: '12px',
-            padding: '24px',
+            padding: 'clamp(16px, 4vw, 24px)',
             boxShadow: '0 4px 16px rgba(0, 0, 0, 0.2)'
           }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '20px' }}>
-              <Activity size={24} color="#6366f1" />
-              <h3 style={{ margin: 0, fontSize: '16px', fontWeight: 600, letterSpacing: '0.5px' }}>
+              <Activity size={window.innerWidth < 768 ? 20 : 24} color="#6366f1" />
+              <h3 style={{ margin: 0, fontSize: 'clamp(13px, 3vw, 16px)', fontWeight: 600, letterSpacing: '0.5px' }}>
                 SECURITY EVENT LOG
               </h3>
             </div>
             <div style={{ maxHeight: '300px', overflowY: 'auto' }}>
               {events.length === 0 ? (
-                <p style={{ color: '#64748b', fontSize: '13px', textAlign: 'center', padding: '20px' }}>
+                <p style={{ color: '#64748b', fontSize: 'clamp(11px, 2vw, 13px)', textAlign: 'center', padding: '20px' }}>
                   No security events detected
                 </p>
               ) : (
                 events.map((event, i) => (
                   <div key={event.id} style={{
-                    padding: '12px',
+                    padding: 'clamp(10px, 2vw, 12px)',
                     background: event.severity === 'critical' ? 'rgba(255, 51, 102, 0.1)' : 'rgba(255, 153, 51, 0.1)',
                     borderLeft: `3px solid ${event.severity === 'critical' ? '#ff3366' : '#ff9933'}`,
                     borderRadius: '4px',
                     marginBottom: i < events.length - 1 ? '10px' : 0,
                     animation: 'slideIn 0.3s ease-out',
-                    fontSize: '12px'
+                    fontSize: 'clamp(10px, 2vw, 12px)'
                   }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px' }}>
-                      <span style={{ color: event.severity === 'critical' ? '#ff3366' : '#ff9933', fontWeight: 600, textTransform: 'uppercase', fontSize: '11px' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px', gap: '10px', flexWrap: 'wrap' }}>
+                      <span style={{ color: event.severity === 'critical' ? '#ff3366' : '#ff9933', fontWeight: 600, textTransform: 'uppercase', fontSize: 'clamp(9px, 1.8vw, 11px)' }}>
                         {event.severity}
                       </span>
-                      <span style={{ color: '#64748b', fontSize: '11px' }}>{event.timestamp.split(',')[1]}</span>
+                      <span style={{ color: '#64748b', fontSize: 'clamp(9px, 1.8vw, 11px)' }}>{event.timestamp.split(',')[1]}</span>
                     </div>
-                    <p style={{ margin: 0, color: '#cbd5e1' }}>{event.description}</p>
+                    <p style={{ margin: 0, color: '#cbd5e1', wordWrap: 'break-word' }}>{event.description}</p>
                   </div>
                 ))
               )}
@@ -1191,37 +1245,37 @@ const CyberSentrix = () => {
             backdropFilter: 'blur(10px)',
             border: '2px solid #334155',
             borderRadius: '12px',
-            padding: '24px',
+            padding: 'clamp(16px, 4vw, 24px)',
             boxShadow: '0 4px 16px rgba(0, 0, 0, 0.2)'
           }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '20px' }}>
-              <Clock size={24} color="#6366f1" />
-              <h3 style={{ margin: 0, fontSize: '16px', fontWeight: 600, letterSpacing: '0.5px' }}>
+              <Clock size={window.innerWidth < 768 ? 20 : 24} color="#6366f1" />
+              <h3 style={{ margin: 0, fontSize: 'clamp(13px, 3vw, 16px)', fontWeight: 600, letterSpacing: '0.5px' }}>
                 OTP ACTIVITY MONITOR
               </h3>
             </div>
             <div style={{ maxHeight: '300px', overflowY: 'auto' }}>
               {otpActivity.length === 0 ? (
-                <p style={{ color: '#64748b', fontSize: '13px', textAlign: 'center', padding: '20px' }}>
+                <p style={{ color: '#64748b', fontSize: 'clamp(11px, 2vw, 13px)', textAlign: 'center', padding: '20px' }}>
                   No recent OTP requests
                 </p>
               ) : (
                 otpActivity.map((otp, i) => (
                   <div key={otp.id} style={{
-                    padding: '12px',
+                    padding: 'clamp(10px, 2vw, 12px)',
                     background: 'rgba(139, 92, 246, 0.1)',
                     border: '1px solid #8b5cf640',
                     borderRadius: '6px',
                     marginBottom: i < otpActivity.length - 1 ? '8px' : 0,
-                    fontSize: '12px'
+                    fontSize: 'clamp(10px, 2vw, 12px)'
                   }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px', gap: '10px' }}>
                       <span style={{ color: '#cbd5e1', fontWeight: 600 }}>{otp.service}</span>
-                      <span style={{ color: '#64748b', fontSize: '11px' }}>{otp.timestamp}</span>
+                      <span style={{ color: '#64748b', fontSize: 'clamp(9px, 1.8vw, 11px)' }}>{otp.timestamp}</span>
                     </div>
                     <div style={{ 
                       fontFamily: 'monospace', 
-                      fontSize: '18px', 
+                      fontSize: 'clamp(14px, 3vw, 18px)', 
                       color: '#8b5cf6',
                       letterSpacing: '2px',
                       fontWeight: 700
