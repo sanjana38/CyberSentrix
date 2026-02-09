@@ -127,6 +127,17 @@ const getRiskLevel = (score) => {
 };
 
 const CyberSentrix = () => {
+  const [screenWidth, setScreenWidth] = useState(window.innerWidth);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setScreenWidth(window.innerWidth);
+    };
+
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
   const [riskScore, setRiskScore] = useState(5);
   const [events, setEvents] = useState([]);
   const [servicesLocked, setServicesLocked] = useState(false);
@@ -579,7 +590,7 @@ const CyberSentrix = () => {
       {/* Header */}
       <div style={{ position: 'relative', zIndex: 10, marginBottom: 'clamp(15px, 4vw, 30px)' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 'clamp(10px, 2vw, 15px)', marginBottom: '10px' }}>
-          <Shield size={window.innerWidth < 768 ? 28 : 40} color="#6366f1" style={{ animation: 'glow 2s infinite', flexShrink: 0 }} />
+          <Shield size={screenWidth < 768 ? 28 : 40} color="#6366f1" style={{ animation: 'glow 2s infinite', flexShrink: 0 }} />
           <div style={{ minWidth: 0 }}>
             <h1 style={{ 
               margin: 0, 
@@ -597,7 +608,7 @@ const CyberSentrix = () => {
               fontSize: 'clamp(9px, 2vw, 13px)', 
               color: '#94a3b8', 
               letterSpacing: '0.5px',
-              whiteSpace: window.innerWidth < 480 ? 'normal' : 'nowrap',
+              whiteSpace: screenWidth < 480 ? 'normal' : 'nowrap',
               overflow: 'hidden',
               textOverflow: 'ellipsis'
             }}>
@@ -665,7 +676,7 @@ const CyberSentrix = () => {
             overflowY: 'auto'
           }}>
             <div style={{ display: 'flex', alignItems: 'flex-start', gap: '15px', marginBottom: '20px' }}>
-              <AlertTriangle size={window.innerWidth < 768 ? 24 : 32} color={riskLevel.color} style={{ flexShrink: 0 }} />
+              <AlertTriangle size={screenWidth < 768 ? 24 : 32} color={riskLevel.color} style={{ flexShrink: 0 }} />
               <div style={{ flex: 1, minWidth: 0 }}>
                 <h3 style={{ margin: '0 0 10px 0', fontSize: 'clamp(14px, 3vw, 18px)', color: riskLevel.color }}>
                   SECURITY ALERT
@@ -742,7 +753,7 @@ const CyberSentrix = () => {
                   justifyContent: 'center',
                   animation: biometricVerifying ? 'riskPulse 1s infinite' : 'none'
                 }}>
-                  <Fingerprint size={window.innerWidth < 768 ? 40 : 60} color="#6366f1" />
+                  <Fingerprint size={screenWidth < 768 ? 40 : 60} color="#6366f1" />
                 </div>
                 <p style={{ marginBottom: '20px', color: '#cbd5e1', fontSize: 'clamp(11px, 2.5vw, 13px)' }}>
                   {biometricVerifying ? 'Verifying your identity...' : 
@@ -779,7 +790,7 @@ const CyberSentrix = () => {
             {/* Step 1: Identity Confirmed */}
             {recoveryStep === 1 && (
               <div style={{ textAlign: 'center' }}>
-                <Check size={window.innerWidth < 768 ? 60 : 80} color="#00ff88" style={{ marginBottom: '20px' }} />
+                <Check size={screenWidth < 768 ? 60 : 80} color="#00ff88" style={{ marginBottom: '20px' }} />
                 <h4 style={{ margin: '0 0 10px 0', color: '#00ff88', fontSize: 'clamp(14px, 3vw, 18px)' }}>
                   Identity Verified
                 </h4>
@@ -791,7 +802,7 @@ const CyberSentrix = () => {
             {recoveryStep === 2 && (
               <div style={{ textAlign: 'center' }}>
                 <div style={{ marginBottom: '20px', animation: 'spin 1s linear infinite' }}>
-                  <Zap size={window.innerWidth < 768 ? 60 : 80} color="#6366f1" />
+                  <Zap size={screenWidth < 768 ? 60 : 80} color="#6366f1" />
                 </div>
                 <h4 style={{ margin: '0 0 10px 0', color: '#6366f1', fontSize: 'clamp(14px, 3vw, 18px)' }}>
                   Restoring Services
@@ -803,7 +814,7 @@ const CyberSentrix = () => {
             {/* Step 3: Complete */}
             {recoveryStep === 3 && (
               <div style={{ textAlign: 'center' }}>
-                <Shield size={window.innerWidth < 768 ? 60 : 80} color="#00ff88" style={{ marginBottom: '20px' }} />
+                <Shield size={screenWidth < 768 ? 60 : 80} color="#00ff88" style={{ marginBottom: '20px' }} />
                 <h4 style={{ margin: '0 0 10px 0', color: '#00ff88', fontSize: 'clamp(14px, 3vw, 18px)' }}>
                   Recovery Complete
                 </h4>
@@ -879,7 +890,7 @@ const CyberSentrix = () => {
         {/* Main Grid */}
         <div style={{ 
           display: 'grid', 
-          gridTemplateColumns: window.innerWidth < 768 ? '1fr' : 'repeat(auto-fit, minmax(280px, 1fr))', 
+          gridTemplateColumns: screenWidth < 768 ? '1fr' : 'repeat(auto-fit, minmax(280px, 1fr))', 
           gap: 'clamp(12px, 3vw, 20px)', 
           marginBottom: 'clamp(15px, 3vw, 25px)' 
         }}>
@@ -893,7 +904,7 @@ const CyberSentrix = () => {
             boxShadow: '0 4px 16px rgba(0, 0, 0, 0.2)'
           }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '20px' }}>
-              <Smartphone size={window.innerWidth < 768 ? 20 : 24} color={deviceInfo.trusted ? '#6366f1' : '#ff3366'} />
+              <Smartphone size={screenWidth < 768 ? 20 : 24} color={deviceInfo.trusted ? '#6366f1' : '#ff3366'} />
               <h3 style={{ margin: 0, fontSize: 'clamp(13px, 3vw, 16px)', fontWeight: 600, letterSpacing: '0.5px' }}>
                 DEVICE STATUS (REAL)
               </h3>
@@ -952,7 +963,7 @@ const CyberSentrix = () => {
             boxShadow: '0 4px 16px rgba(0, 0, 0, 0.2)'
           }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '20px' }}>
-              <MapPin size={window.innerWidth < 768 ? 20 : 24} color={location.trusted ? '#6366f1' : '#ff3366'} />
+              <MapPin size={screenWidth < 768 ? 20 : 24} color={location.trusted ? '#6366f1' : '#ff3366'} />
               <h3 style={{ margin: 0, fontSize: 'clamp(13px, 3vw, 16px)', fontWeight: 600, letterSpacing: '0.5px' }}>
                 LOCATION (REAL)
               </h3>
@@ -1023,7 +1034,7 @@ const CyberSentrix = () => {
             boxShadow: '0 4px 16px rgba(0, 0, 0, 0.2)'
           }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '20px' }}>
-              {servicesLocked ? <Lock size={window.innerWidth < 768 ? 20 : 24} color="#ff3366" /> : <Activity size={window.innerWidth < 768 ? 20 : 24} color="#6366f1" />}
+              {servicesLocked ? <Lock size={screenWidth < 768 ? 20 : 24} color="#ff3366" /> : <Activity size={screenWidth < 768 ? 20 : 24} color="#6366f1" />}
               <h3 style={{ margin: 0, fontSize: 'clamp(13px, 3vw, 16px)', fontWeight: 600, letterSpacing: '0.5px' }}>
                 SERVICES STATUS
               </h3>
@@ -1077,12 +1088,12 @@ const CyberSentrix = () => {
             gap: '10px',
             flexWrap: 'wrap'
           }}>
-            <Zap size={window.innerWidth < 768 ? 20 : 24} color="#6366f1" />
+            <Zap size={screenWidth < 768 ? 20 : 24} color="#6366f1" />
             <span>THREAT SIMULATION CONTROLS</span>
           </h3>
           <div style={{ 
             display: 'grid', 
-            gridTemplateColumns: window.innerWidth < 640 ? '1fr' : 'repeat(auto-fit, minmax(180px, 1fr))', 
+            gridTemplateColumns: screenWidth < 640 ? '1fr' : 'repeat(auto-fit, minmax(180px, 1fr))', 
             gap: 'clamp(8px, 2vw, 12px)' 
           }}>
             <button
@@ -1184,7 +1195,7 @@ const CyberSentrix = () => {
                 boxShadow: '0 0 30px rgba(0, 255, 136, 0.4)'
               }}
             >
-              <Fingerprint size={window.innerWidth < 768 ? 16 : 20} />
+              <Fingerprint size={screenWidth < 768 ? 16 : 20} />
               <span>INITIATE ACCOUNT RECOVERY</span>
             </button>
           )}
@@ -1192,7 +1203,7 @@ const CyberSentrix = () => {
 
         <div style={{ 
           display: 'grid', 
-          gridTemplateColumns: window.innerWidth < 768 ? '1fr' : 'repeat(auto-fit, minmax(280px, 1fr))', 
+          gridTemplateColumns: screenWidth < 768 ? '1fr' : 'repeat(auto-fit, minmax(280px, 1fr))', 
           gap: 'clamp(12px, 3vw, 20px)' 
         }}>
           {/* Event Log */}
@@ -1205,7 +1216,7 @@ const CyberSentrix = () => {
             boxShadow: '0 4px 16px rgba(0, 0, 0, 0.2)'
           }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '20px' }}>
-              <Activity size={window.innerWidth < 768 ? 20 : 24} color="#6366f1" />
+              <Activity size={screenWidth < 768 ? 20 : 24} color="#6366f1" />
               <h3 style={{ margin: 0, fontSize: 'clamp(13px, 3vw, 16px)', fontWeight: 600, letterSpacing: '0.5px' }}>
                 SECURITY EVENT LOG
               </h3>
@@ -1249,7 +1260,7 @@ const CyberSentrix = () => {
             boxShadow: '0 4px 16px rgba(0, 0, 0, 0.2)'
           }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '20px' }}>
-              <Clock size={window.innerWidth < 768 ? 20 : 24} color="#6366f1" />
+              <Clock size={screenWidth < 768 ? 20 : 24} color="#6366f1" />
               <h3 style={{ margin: 0, fontSize: 'clamp(13px, 3vw, 16px)', fontWeight: 600, letterSpacing: '0.5px' }}>
                 OTP ACTIVITY MONITOR
               </h3>
